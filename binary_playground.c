@@ -91,7 +91,8 @@ int main(int argc, char **argv) {
     /* Default configuration */
     const char *mode = "scalar"; /* mode can be: scalar, vector, struct */
     int use_lib = 0;              /* when true, attempt to load functions from a shared library */
-    float a = 0.0f, b = 0.0f, c = 0.0f; /* scalar inputs for scalar mode */
+    /* Default scalar values now set to 1,2,3 as requested */
+    float a = 1.0f, b = 2.0f, c = 3.0f; /* scalar inputs for scalar mode */
 
     /* Command-line options parsed with getopt_long */
     static struct option long_options[] = {

@@ -7,8 +7,7 @@ CLI to exercise them.
 The main purpose is to use it to lean how to precompile existing C/Fortran code with [BinaryBuilder](binarybuilder.org), and -once that is done- generate Julia wrappers for the various functions.
 
 Files of interest
-- `binary_playground.c` - implementation and `main()` with CLI and optional
-	dynamic loading via `dlopen`.
+- `binary_playground.c` - implementation and `main()` with CLI; calls the summation functions directly.
 - `binary_playground.h` - public declarations and `MyStruct` definition.
 - `Makefile` - builds the executable and a dynamic library.
 
@@ -20,7 +19,8 @@ Build the executable:
 make
 ```
 
-Build the dynamic library (macOS `.dylib` or Linux `.so`):
+Build the dynamic library (macOS `.dylib` or Linux `.so`) if you need a
+separate library for other purposes:
 
 ```sh
 make lib
@@ -46,12 +46,10 @@ Run the built-in struct example:
 ./binary_playground --mode struct
 ```
 
-Run the program while forcing it to load and call the functions from the
-shared library you built with `make lib`:
 
-```sh
-./binary_playground --use-lib --mode scalar --a 1 --b 2 --c 3
-```
+Note: the executable calls the functions locally and no longer performs
+runtime dynamic loading. The `lib` target remains for users who want to
+produce a shared library for other uses.
 
 Cleaning
 
@@ -60,7 +58,6 @@ make clean
 ```
 
 Notes
-- The `Makefile` adds `-Wno-nullability-completeness` on macOS to suppress
-	noisy system-header warnings.
-- The program demonstrates both direct calls and dynamic symbol lookup with
-	`dlsym`/`dlopen` for learning purposes.
+- The `Makefile` adds `-Wno-nullability-completeness` on macOS to suppress noisy system-header warnings.
+- The program demonstrates direct calls to the local functions; runtime
+	`dlopen`/`dlsym` usage has been removed from the executable.

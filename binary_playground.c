@@ -25,21 +25,15 @@
 #    Run struct example (uses two example structs):
 #      ./binary_playground --mode struct
 #
-#    Build a dynamic library and run the program loading it at runtime:
+#    Build shared library:
 #      make lib
-#      ./binary_playground --use-lib --mode scalar --a 1 --b 2 --c 3
-#
-#  The program will attempt to `dlopen` a local library named
-#  `libbinary_playground.dylib` (macOS) or `libbinary_playground.so` (Linux)
-#  when `--use-lib` is passed.
-#
+#       
 *******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-#include <dlfcn.h>
 #include "binary_playground.h"
 
 /*
@@ -90,14 +84,12 @@ static void print_usage(const char *prog) {
 int main(int argc, char **argv) {
     /* Default configuration */
     const char *mode = "scalar"; /* mode can be: scalar, vector, struct */
-    int use_lib = 0;              /* when true, attempt to load functions from a shared library */
     /* Default scalar values now set to 1,2,3 as requested */
     float a = 1.0f, b = 2.0f, c = 3.0f; /* scalar inputs for scalar mode */
 
     /* Command-line options parsed with getopt_long */
     static struct option long_options[] = {
         {"mode", required_argument, 0, 'm'},
-        {"use-lib", no_argument, 0, 'u'},
         {"a", required_argument, 0, 'a'},
         {"b", required_argument, 0, 'b'},
         {"c", required_argument, 0, 'c'},
@@ -106,10 +98,9 @@ int main(int argc, char **argv) {
     };
 
     int opt;
-    while ((opt = getopt_long(argc, argv, "m:ua:b:c:h", long_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "m:a:b:c:h", long_options, NULL)) != -1) {
         switch (opt) {
             case 'm': mode = optarg; break;
-            case 'u': use_lib = 1; break;
             case 'a': a = strtof(optarg, NULL); break;
             case 'b': b = strtof(optarg, NULL); break;
             case 'c': c = strtof(optarg, NULL); break;
@@ -118,40 +109,16 @@ int main(int argc, char **argv) {
         }
     }
 
-    /* If requested, attempt to load the functions from a dynamic library */
-    void *handle = NULL;
-    float (*lib_sum_scalars)(float, float, float) = NULL;
-    void (*lib_sum_vectors)(float *, const float *, const float *, size_t) = NULL;
-    MyStruct (*lib_sum_structs)(const MyStruct *, const MyStruct *) = NULL;
-
-    if (use_lib) {
-        /* Try macOS .dylib first, then fallback to .so */
-        const char *libname = "./libbinary_playground.dylib";
-        handle = dlopen(libname, RTLD_LAZY);
-        if (!handle) {
-            libname = "./libbinary_playground.so";
-            handle = dlopen(libname, RTLD_LAZY);
-        }
-        if (!handle) {
-            fprintf(stderr, "Failed to open dynamic library: %s\n", dlerror());
-            return 1;
-        }
-
-        /* Resolve symbols; if they are not found, the pointers remain NULL */
-        lib_sum_scalars = (float (*)(float,float,float))dlsym(handle, "sum_scalars");
-        lib_sum_vectors = (void (*)(float*,const float*,const float*,size_t))dlsym(handle, "sum_vectors");
-        lib_sum_structs = (MyStruct (*)(const MyStruct*,const MyStruct*))dlsym(handle, "sum_structs");
-    }
+    /* NOTE: dynamic loading support removed — program always calls the
+     * local functions directly. The `Makefile` still offers a `lib` target
+     * if you want to build a shared library for other uses, but this
+     * executable will not attempt to dlopen it.
+     */
 
     /* Dispatch by mode */
     if (strcmp(mode, "scalar") == 0) {
-        /* Use library function if available and requested, otherwise local */
-        float res;
-        if (use_lib && lib_sum_scalars) {
-            res = lib_sum_scalars(a, b, c);
-        } else {
-            res = sum_scalars(a, b, c);
-        }
+        /* Direct local call */
+        float res = sum_scalars(a, b, c);
         printf("sum_scalars(%f, %f, %f) = %f\n", a, b, c, res);
 
     } else if (strcmp(mode, "vector") == 0) {
@@ -161,11 +128,8 @@ int main(int argc, char **argv) {
         float v2[3] = {0.5f, 0.5f, 0.5f};
         float v3[3] = {0.1f, 0.2f, 0.3f};
 
-        if (use_lib && lib_sum_vectors) {
-            lib_sum_vectors(v1, v2, v3, len);
-        } else {
-            sum_vectors(v1, v2, v3, len);
-        }
+        /* Direct local call */
+        sum_vectors(v1, v2, v3, len);
 
         printf("sum_vectors result: [");
         for (size_t i = 0; i < len; ++i) {
@@ -179,21 +143,15 @@ int main(int argc, char **argv) {
         MyStruct s2 = { .x = 4, .y = 1.5f, .z = 0.75 };
         MyStruct out;
 
-        if (use_lib && lib_sum_structs) {
-            out = lib_sum_structs(&s1, &s2);
-        } else {
-            out = sum_structs(&s1, &s2);
-        }
+        /* Direct local call */
+        out = sum_structs(&s1, &s2);
 
         printf("sum_structs: x=%d, y=%f, z=%f\n", out.x, out.y, out.z);
 
     } else {
         fprintf(stderr, "Unknown mode '%s'\n", mode);
         print_usage(argv[0]);
-        if (handle) dlclose(handle);
         return 1;
     }
-
-    if (handle) dlclose(handle);
     return 0;
 }

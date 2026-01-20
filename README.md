@@ -4,6 +4,8 @@ This small repository demonstrates a tiny C program that implements three
 kinds of summation functions (scalars, vectors, and structs) and a simple
 CLI to exercise them.
 
+The main purpose is to use it to lean how to precompile existing C/Fortran code with [BinaryBuilder](binarybuilder.org), and -once that is done- generate Julia wrappers for the various functions.
+
 Files of interest
 - `binary_playground.c` - implementation and `main()` with CLI and optional
 	dynamic loading via `dlopen`.
@@ -62,5 +64,3 @@ Notes
 	noisy system-header warnings.
 - The program demonstrates both direct calls and dynamic symbol lookup with
 	`dlsym`/`dlopen` for learning purposes.
-# julia_binary_interaction_playground
-Sample C-code to learn how to use BinaryBuilder to precompile binaries across platforms &amp; call them from Julia

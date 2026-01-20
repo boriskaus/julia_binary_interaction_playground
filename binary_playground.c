@@ -39,9 +39,9 @@
 /*
  * sum_scalars
  * ---------------
- * Compute the sum of three scalar floats and return the result.
+ * Compute the sum of three scalar doubles and return the result.
  */
-float sum_scalars(float a, float b, float c) {
+double sum_scalars(double a, double b, double c) {
     return a + b + c;
 }
 
@@ -52,7 +52,7 @@ float sum_scalars(float a, float b, float c) {
  * the first vector (`v1`). All arrays are assumed to have at least `len`
  * elements.
  */
-void sum_vectors(float *v1, const float *v2, const float *v3, size_t len) {
+void sum_vectors(double *v1, const double *v2, const double *v3, size_t len) {
     for (size_t i = 0; i < len; ++i) {
         v1[i] = v1[i] + v2[i] + v3[i];
     }
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     /* Default configuration */
     const char *mode = "scalar"; /* mode can be: scalar, vector, struct */
     /* Default scalar values now set to 1,2,3 as requested */
-    float a = 1.0f, b = 2.0f, c = 3.0f; /* scalar inputs for scalar mode */
+    double a = 1.0, b = 2.0, c = 3.0; /* scalar inputs for scalar mode */
 
     /* Command-line options parsed with getopt_long */
     static struct option long_options[] = {
@@ -124,9 +124,9 @@ int main(int argc, char **argv) {
     } else if (strcmp(mode, "vector") == 0) {
         /* Example fixed-length vectors for demonstration */
         size_t len = 3;
-        float v1[3] = {1.0f, 2.0f, 3.0f};
-        float v2[3] = {0.5f, 0.5f, 0.5f};
-        float v3[3] = {0.1f, 0.2f, 0.3f};
+        double v1[3] = {1.0, 2.0, 3.0};
+        double v2[3] = {0.5, 0.5, 0.5};
+        double v3[3] = {0.1, 0.2, 0.3};
 
         /* Direct local call */
         sum_vectors(v1, v2, v3, len);

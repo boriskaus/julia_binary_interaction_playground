@@ -12,6 +12,7 @@ else
 	LIBFLAGS = -shared
 endif
 
+LDLIBS ?= -ldl
 
 TARGET = binary_playground
 SRC = binary_playground.c

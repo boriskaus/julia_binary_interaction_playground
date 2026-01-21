@@ -20,7 +20,7 @@ lib: $(SRC) $(HDR)
 	$(CC) $(CFLAGS) -dynamiclib -o $(LIBNAME) $(SRC)
 	# Also build a shared object for Linux compatibility. If the platform
 	# does not support `-shared`, ignore the failure of this step.
-	$(CC) $(CFLAGS) -shared -fPIC -o libbinary_playground.so $(SRC) || true
+	$(CC) $(CFLAGS) -shared -fPIC -o libbinary_playground.so $(SRC) $(LDLIBS) || true
 
 run: $(TARGET)
 	./$(TARGET)

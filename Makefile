@@ -1,6 +1,6 @@
 CC ?= gcc
 CFLAGS ?= -Wall -Wextra -O2 -fPIC -Wno-nullability-completeness
-LDLIBS ?=
+LDLIBS ?= -ldl
 
 TARGET = binary_playground
 SRC = binary_playground.c

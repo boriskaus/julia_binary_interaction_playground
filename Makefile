@@ -1,6 +1,17 @@
-CC ?= gcc
-CFLAGS ?= -Wall -Wextra -O2 -fPIC -Wno-nullability-completeness
-LDLIBS ?= -ldl
+# Detect OS
+UNAME := $(shell uname)
+ifeq ($(UNAME), Darwin)
+	# macOS
+	CC ?= clang
+	CFLAGS ?= -Wall -Wextra -O2 -fPIC -std=c99 -Wno-nullability-completeness
+	LIBFLAGS = -dynamiclib
+else
+	# Linux (and others)
+	CC ?= gcc
+	CFLAGS ?= -Wall -Wextra -O2 -fPIC -std=c99
+	LIBFLAGS = -shared
+endif
+
 
 TARGET = binary_playground
 SRC = binary_playground.c

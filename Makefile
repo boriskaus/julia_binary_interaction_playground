@@ -2,7 +2,7 @@
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
 	# macOS
-	CC ?= clang
+	CC ?= gcc
 	CFLAGS ?= -Wall -Wextra -O2 -fPIC -std=c99 -Wno-nullability-completeness
 	LIBFLAGS = -dynamiclib
 else
